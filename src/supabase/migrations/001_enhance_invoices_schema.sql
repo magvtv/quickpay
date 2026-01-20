@@ -1,11 +1,7 @@
--- ============================================
--- ENABLE UUID EXTENSION
--- ============================================
+-- Enable UUID Extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- ============================================
--- CREATE USERS TABLE (if not using Supabase Auth metadata)
--- ============================================
+-- Create USERS table (if not using Supabase Auth metadata)
 -- Skip if you're storing user data in auth.users metadata
 CREATE TABLE IF NOT EXISTS public.users (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
@@ -17,9 +13,8 @@ CREATE TABLE IF NOT EXISTS public.users (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ============================================
--- CREATE CLIENTS TABLE
--- ============================================
+
+-- Create CLIENTS table
 CREATE TABLE IF NOT EXISTS public.clients (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
@@ -32,9 +27,8 @@ CREATE TABLE IF NOT EXISTS public.clients (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ============================================
--- MODIFY EXISTING INVOICES TABLE
--- ============================================
+
+-- Modify existing INVOICES table
 -- Add missing columns to your existing invoices table
 ALTER TABLE public.invoices 
   ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
@@ -59,9 +53,8 @@ ALTER TABLE public.invoices
 ALTER TABLE public.invoices 
   RENAME COLUMN amount TO total;
 
--- ============================================
--- CREATE INVOICE ITEMS TABLE
--- ============================================
+
+-- Create INVOICE ITEMS table
 CREATE TABLE IF NOT EXISTS public.invoice_items (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   invoice_id UUID REFERENCES public.invoices(id) ON DELETE CASCADE NOT NULL,
@@ -73,9 +66,7 @@ CREATE TABLE IF NOT EXISTS public.invoice_items (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ============================================
--- CREATE PAYMENTS TABLE
--- ============================================
+-- Create PAYMENTS table
 CREATE TABLE IF NOT EXISTS public.payments (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   invoice_id UUID REFERENCES public.invoices(id) ON DELETE CASCADE NOT NULL,
@@ -87,9 +78,8 @@ CREATE TABLE IF NOT EXISTS public.payments (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ============================================
--- CREATE INDEXES FOR PERFORMANCE
--- ============================================
+
+-- Create INDEXES for performances
 CREATE INDEX IF NOT EXISTS idx_invoices_user_id ON public.invoices(user_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_client_id ON public.invoices(client_id);
 CREATE INDEX IF NOT EXISTS idx_invoices_status ON public.invoices(status);
@@ -98,9 +88,8 @@ CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice_id ON public.invoice_items(
 CREATE INDEX IF NOT EXISTS idx_payments_invoice_id ON public.payments(invoice_id);
 CREATE INDEX IF NOT EXISTS idx_clients_user_id ON public.clients(user_id);
 
--- ============================================
--- CREATE UPDATED_AT TRIGGER FUNCTION
--- ============================================
+
+-- Create UPDATED_AT trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -109,9 +98,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- ============================================
--- CREATE TRIGGERS
--- ============================================
+
+-- Create TRIGGERS to auto-update updated_at columns
 DROP TRIGGER IF EXISTS update_invoices_updated_at ON public.invoices;
 CREATE TRIGGER update_invoices_updated_at
   BEFORE UPDATE ON public.invoices
@@ -130,9 +118,8 @@ CREATE TRIGGER update_users_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- ============================================
--- ROW LEVEL SECURITY (RLS)
--- ============================================
+
+-- ROW LEVEL SECURITY (RLS) Policies
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
@@ -228,9 +215,7 @@ CREATE POLICY "Users can create own payments" ON public.payments
     )
   );
 
--- ============================================
--- FUNCTION: Auto-update invoice status based on due_date
--- ============================================
+-- Function: Auto-update invoice status based on due_date
 CREATE OR REPLACE FUNCTION update_invoice_status()
 RETURNS void AS $$
 BEGIN
@@ -243,9 +228,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- ============================================
--- FUNCTION: Generate unique invoice number
--- ============================================
+-- Function: Generate unique invoice number
 CREATE OR REPLACE FUNCTION generate_invoice_number()
 RETURNS TEXT AS $$
 DECLARE
@@ -265,9 +248,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- ============================================
--- SEED DATA (Optional - for development)
--- ============================================
+
+-- SEED DATA (For development)
+
 -- Insert a test user (you'll need to replace with actual auth.users id)
 -- INSERT INTO public.users (id, email, full_name, company_name)
 -- VALUES (

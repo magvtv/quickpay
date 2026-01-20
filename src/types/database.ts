@@ -116,7 +116,7 @@ export interface Database {
           client_email?: string
         }
         Update: {
-          id?: string
+          id: string
           user_id?: string
           client_id?: string | null
           invoice_number?: string
@@ -174,7 +174,7 @@ export interface Database {
           invoice_id: string
           amount: number
           payment_date: string
-          payment_method: 'bank_transfer' | 'card' | 'cash' | 'mpesa' | 'other'
+          payment_method: 'bank_transfer' | 'card' | 'cash' | 'other'
           reference: string | null
           notes: string | null
           created_at: string
@@ -184,7 +184,7 @@ export interface Database {
           invoice_id: string
           amount: number
           payment_date?: string
-          payment_method: 'bank_transfer' | 'card' | 'cash' | 'mpesa' | 'other'
+          payment_method: 'bank_transfer' | 'card' | 'cash' | 'other'
           reference?: string | null
           notes?: string | null
           created_at?: string
@@ -194,7 +194,7 @@ export interface Database {
           invoice_id?: string
           amount?: number
           payment_date?: string
-          payment_method?: 'bank_transfer' | 'card' | 'cash' | 'mpesa' | 'other'
+          payment_method?: 'bank_transfer' | 'card' | 'cash' | 'other'
           reference?: string | null
           notes?: string | null
           created_at?: string
