@@ -162,3 +162,37 @@ export const invoiceFilterSchema = z.object({
   max_amount: z.number().min(0).optional(),
   search_query: z.string().max(100).optional(),
 });
+
+// Utility Functions
+
+/**
+ * Calculate invoice totals from line items and tax rate
+ */
+export const calculateInvoiceTotals = (
+  items: Array<{ quantity: number; unit_price: number; amount?: number }>,
+  taxRate: number = 0
+): { subtotal: number; tax_amount: number; total: number } => {
+  const subtotal = items.reduce((sum, item) => {
+    const amount = item.amount ?? item.quantity * item.unit_price;
+    return sum + amount;
+  }, 0);
+
+  const tax_amount = (subtotal * taxRate) / 100;
+  const total = subtotal + tax_amount;
+
+  return {
+    subtotal: Math.round(subtotal * 100) / 100,
+    tax_amount: Math.round(tax_amount * 100) / 100,
+    total: Math.round(total * 100) / 100,
+  };
+};
+
+/**
+ * Generate a unique invoice number
+ */
+export const generateInvoiceNumber = (prefix: string = 'INV'): string => {
+  const year = new Date().getFullYear();
+  const timestamp = Date.now().toString(36).toUpperCase().slice(-6);
+  const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+  return `${prefix}-${year}-${timestamp}${random}`;
+};
