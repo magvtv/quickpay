@@ -11,30 +11,48 @@ interface InvoiceRowProps {
 
 export default function InvoiceRow({ invoice, onClick }: InvoiceRowProps) {
   return (
-    <tr className="table-row" onClick={onClick}>
-      <td className="table-cell">
-        <span className="font-medium text-gray-900">{invoice.invoice_number}</span>
+    <tr 
+      className="hover:bg-gray-50/50 cursor-pointer transition-colors"
+      onClick={onClick}
+    >
+      {/* Invoice Number */}
+      <td className="px-6 py-4 whitespace-nowrap">
+        <span className="text-sm font-semibold text-gray-900">
+          {invoice.invoice_number}
+        </span>
       </td>
-      <td className="table-cell text-gray-600">
-        {formatDate(invoice.issue_date, 'short')}
+
+      {/* Date */}
+      <td className="px-6 py-4 whitespace-nowrap">
+        <span className="text-sm text-gray-600">
+          {formatDate(invoice.created_at, 'short')}
+        </span>
       </td>
-      <td className="table-cell">
+
+      {/* Client */}
+      <td className="px-6 py-4 whitespace-nowrap">
         <div>
-          <div className="font-medium text-gray-900">
-            {invoice.client_name || 'N/A'}
-          </div>
+          <p className="text-sm font-medium text-gray-900">
+            {invoice.client_name || 'Unknown Client'}
+          </p>
           {invoice.client_email && (
-            <div className="text-sm text-gray-500">{invoice.client_email}</div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {invoice.client_email}
+            </p>
           )}
         </div>
       </td>
-      <td className="table-cell text-right font-medium text-gray-900">
-        {formatCurrency(invoice.total)}
+
+      {/* Amount */}
+      <td className="px-6 py-4 whitespace-nowrap text-right">
+        <span className="text-sm font-semibold text-gray-900">
+          {formatCurrency(invoice.total)}
+        </span>
       </td>
-      <td className="table-cell text-right">
-        <div className="flex justify-end">
-          <StatusBadge status={invoice.status} />
-        </div>
+
+      {/* Status */}
+      <td className="px-6 py-4 whitespace-nowrap text-right">
+        <StatusBadge status={invoice.status} />
       </td>
     </tr>
   );
