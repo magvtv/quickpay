@@ -17,45 +17,53 @@ export default function StatsCard({
   currency = 'USD',
   isLarge = false,
 }: StatsCardProps) {
-  const statusColors = {
-    pending: 'text-blue-600',
-    paid: 'text-green-600',
-    draft: 'text-orange-500',
-  };
+//   const statusColors = {
+//     pending: 'text-blue-600',
+//     paid: 'text-green-600',
+//     draft: 'text-orange-500',
+//   };
 
-  const statusConfig = {
+  const statusConfig: Record<'pending' | 'paid' | 'draft', { dotColor: string; amountColor: string }> = {
     pending: {
         dotColor: 'bg-blue-500',
         amountColor: 'text-blue-600',
     },
+    paid: {
+        dotColor: 'bg-green-500',
+        amountColor: 'text-green-600',
+    },
     draft: {
         dotColor: 'bg-orange-500',
-        amountCoolor: 'text-orange-500',
+        amountColor: 'text-orange-500',
     }
-  }
-
-  const statusDots = {
-    pending: 'bg-blue-500',
-    paid: 'bg-green-500',
-    draft: 'bg-orange-500',
   };
 
+  const config = status ? statusConfig[status] : null;
+
+//   const statusDots = {
+//     pending: 'bg-blue-500',
+//     paid: 'bg-green-500',
+//     draft: 'bg-orange-500',
+//   };
+
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-      {/* Label with Status Indicator */}
-      <div className="flex items-center gap-2 mb-2">
-        {status && (
-          <span className={cn('w-2 h-2 rounded-full', statusDots[status])} />
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      {/* Label with optional status dot */}
+      <div className="flex items-center gap-2 mb-3">
+        
+        {config && (
+            <span className={cn('w-2 h-2 rounded-full', config.dotColor)} />
         )}
         <span className="text-sm font-medium text-gray-600 uppercase tracking-wide">
           {label}
         </span>
       </div>
 
-      {/* Amount */}
+      {/* Amount - Different sizes for main vs secondary cards */}
       <div className={cn(
-        'text-3xl font-semibold mb-1',
-        status ? statusColors[status] : 'text-gray-900'
+        'font-semibold mb-2',
+        isLarge ? 'text-5xl' : 'text-3xl',
+        config ? config.amountColor : 'text-gray-900'
       )}>
         {formatCurrency(amount, currency)}
       </div>

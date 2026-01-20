@@ -6,10 +6,9 @@ import { copyToClipboard } from '@/lib/utils';
 
 interface QuickPayCardProps {
   username: string;
-  description?: string;
 }
 
-export default function QuickPayCard({ username, description }: QuickPayCardProps) {
+export default function QuickPayCard({ username }: QuickPayCardProps) {
   const [copied, setCopied] = useState(false);
   const quickPayUrl = `quickpay.to/${username}`;
 
@@ -22,49 +21,58 @@ export default function QuickPayCard({ username, description }: QuickPayCardProp
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-      {/* QuickPay Branding */}
-      <div className="flex items-start gap-3 mb-4">
-        <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M13 10h5l-6 8v-6H7l6-8v6z" />
-          </svg>
-        </div>
-        <div>
-          <h3 className="font-semibold text-gray-900">quickpay.to/{username}</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            {description || 'Quickpay lets you receive payments on the fly. You can generate invoice or share the payment link to request the payment.'}
-          </p>
-          <button className="text-sm text-primary font-medium mt-2 hover:underline">
-            LEARN MORE
-          </button>
+    <>
+      <div className="bg-white rounded-2xl p-8 border border-gray-100">
+        <div className="flex items-start justify-between">
+          {/* Left side - Icon and content */}
+          <div className="flex items-start gap-4">
+            {/* QuickPay Icon */}
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+              <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M13 10h5l-6 8v-6H7l6-8v6z" />
+              </svg>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {quickPayUrl}
+              </h3>
+              <p className="text-sm text-gray-600 leading-relaxed mb-3 max-w-2xl">
+                Quickpay lets you receive payments on the fly. You can generate invoice or share the payment link to request the payment.
+              </p>
+              <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 uppercase tracking-wide">
+                LEARN MORE
+              </button>
+            </div>
+          </div>
+
+          {/* Right side - Action buttons */}
+          <div className="flex items-center gap-2 ml-4">
+            <button className="p-2.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+              <PencilIcon className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleCopy}
+              className="p-2.5 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              {copied ? (
+                <CheckIcon className="w-5 h-5 text-green-600" />
+              ) : (
+                <DocumentDuplicateIcon className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2">
-        <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-          <PencilIcon className="w-5 h-5" />
-        </button>
-        <button
-          onClick={handleCopy}
-          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors relative"
-        >
-          {copied ? (
-            <CheckIcon className="w-5 h-5 text-green-600" />
-          ) : (
-            <DocumentDuplicateIcon className="w-5 h-5" />
-          )}
-        </button>
-      </div>
-
-      {/* Copy Confirmation Toast */}
+      {/* Copy Toast */}
       {copied && (
-        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-bottom">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-4 z-50">
           <CheckIcon className="w-5 h-5 text-green-400" />
           <span className="text-sm font-medium">QuickPay link copied!</span>
         </div>
       )}
-    </div>
+    </>
   );
 }
