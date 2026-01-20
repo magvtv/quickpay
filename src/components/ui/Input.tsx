@@ -1,43 +1,49 @@
-import { ButtonHTMLAttributes, forwardRef } from 'react';
+import { InputHTMLAttributes, forwardRef, useId } from 'react';
 import { cn } from '@/lib/utils';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  isLoading?: boolean;
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-    
-    const variants = {
-      primary: 'bg-primary text-white hover:bg-primary-dark focus:ring-primary',
-      secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300',
-      ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-300',
-      danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500',
-    };
-
-    const sizes = {
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-4 py-2 text-base',
-      lg: 'px-6 py-3 text-lg',
-    };
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className, label, error, id, ...props }, ref) => {
+    const generatedId = useId();
+    const inputId = id || generatedId;
 
     return (
-      <button
-        ref={ref}
-        className={cn(baseStyles, variants[variant], sizes[size], className)}
-        disabled={disabled || isLoading}
-        {...props}
-      >
-        {isLoading && <span className="spinner mr-2" />}
-        {children}
-      </button>
+      <div className="w-full">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            {label}
+          </label>
+        )}
+        <input
+          ref={ref}
+          id={inputId}
+          className={cn(
+            'w-full px-3 py-2.5 border rounded-lg text-sm',
+            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+            'disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed',
+            'transition-all duration-200',
+            error
+              ? 'border-red-300 focus:ring-red-500'
+              : 'border-gray-300',
+            className
+          )}
+          {...props}
+        />
+        {error && (
+          <p className="mt-1 text-sm text-red-600">{error}</p>
+        )}
+      </div>
     );
   }
 );
 
-Button.displayName = 'Button';
+Input.displayName = 'Input';
 
-export default Button;
+export default Input;
