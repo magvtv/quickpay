@@ -3,16 +3,16 @@ import { Database } from "../types/database";
 
 // Environment variables for Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl || !supabasePublishableKey) {
   throw new Error(
     'Missing Supabase environment variables. Check your .env.local file.'
   );
 }
 
 // Supabase Client Browser
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabasePublishableKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -47,7 +47,7 @@ export const uploadInvoiceAttachment = async (
   const fileName = `${invoiceId}-${Date.now()}.${fileExt}`;
   const filePath = `invoices/${fileName}`;
 
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from('attachments')
     .upload(filePath, file, {
       cacheControl: '3600',
@@ -68,18 +68,25 @@ export const uploadInvoiceAttachment = async (
 
 
 // Error Handlers
-export const handleSupabaseError = (error: any): string => {
-  if (error?.code === 'PGRST116') {
+interface SupabaseError {
+  code?: string;
+  message?: string;
+}
+
+export const handleSupabaseError = (error: unknown): string => {
+  const supabaseError = error as SupabaseError;
+  
+  if (supabaseError?.code === 'PGRST116') {
     return 'No data found';
   }
-  if (error?.code === '23505') {
+  if (supabaseError?.code === '23505') {
     return 'This record already exists';
   }
-  if (error?.code === '23503') {
+  if (supabaseError?.code === '23503') {
     return 'Related record not found';
   }
-  if (error?.message) {
-    return error.message;
+  if (supabaseError?.message) {
+    return supabaseError.message;
   }
   return 'An unexpected error occurred';
 };
