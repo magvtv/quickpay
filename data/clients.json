@@ -1,0 +1,57 @@
+[
+  {
+    "id": "650e8400-e29b-41d4-a716-446655440001",
+    "user_id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Tech Solutions Inc",
+    "email": "contact@techsolutions.com",
+    "company_name": "Tech Solutions Inc",
+    "address": "123 Business St, San Francisco, CA 94102",
+    "phone": "+1-555-0101",
+    "created_at": "2024-01-20T10:00:00Z",
+    "updated_at": "2024-01-20T10:00:00Z"
+  },
+  {
+    "id": "650e8400-e29b-41d4-a716-446655440002",
+    "user_id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Sarah Johnson",
+    "email": "sarah.johnson@designstudio.com",
+    "company_name": "Design Studio LLC",
+    "address": "456 Creative Ave, New York, NY 10001",
+    "phone": "+1-555-0102",
+    "created_at": "2024-01-22T10:00:00Z",
+    "updated_at": "2024-01-22T10:00:00Z"
+  },
+  {
+    "id": "650e8400-e29b-41d4-a716-446655440003",
+    "user_id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Michael Chen",
+    "email": "michael@startupco.io",
+    "company_name": "StartupCo",
+    "address": "789 Innovation Blvd, Austin, TX 78701",
+    "phone": "+1-555-0103",
+    "created_at": "2024-01-25T10:00:00Z",
+    "updated_at": "2024-01-25T10:00:00Z"
+  },
+  {
+    "id": "650e8400-e29b-41d4-a716-446655440004",
+    "user_id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Emily Rodriguez",
+    "email": "emily@marketingpro.com",
+    "company_name": "Marketing Pro",
+    "address": "321 Marketing Way, Los Angeles, CA 90001",
+    "phone": "+1-555-0104",
+    "created_at": "2024-02-01T10:00:00Z",
+    "updated_at": "2024-02-01T10:00:00Z"
+  },
+  {
+    "id": "650e8400-e29b-41d4-a716-446655440005",
+    "user_id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "David Williams",
+    "email": "david@consultinggroup.com",
+    "company_name": "Consulting Group",
+    "address": "654 Strategy Lane, Chicago, IL 60601",
+    "phone": "+1-555-0105",
+    "created_at": "2024-02-05T10:00:00Z",
+    "updated_at": "2024-02-05T10:00:00Z"
+  }
+]

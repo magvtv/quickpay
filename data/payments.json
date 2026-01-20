@@ -1,0 +1,22 @@
+[
+  {
+    "id": "950e8400-e29b-41d4-a716-446655440001",
+    "invoice_id": "750e8400-e29b-41d4-a716-446655440001",
+    "amount": 5500.00,
+    "payment_date": "2024-01-20T10:00:00Z",
+    "payment_method": "bank_transfer",
+    "reference": "TXN-2024-001234",
+    "notes": "Payment received via bank transfer",
+    "created_at": "2024-01-20T10:00:00Z"
+  },
+  {
+    "id": "950e8400-e29b-41d4-a716-446655440002",
+    "invoice_id": "750e8400-e29b-41d4-a716-446655440005",
+    "amount": 13200.00,
+    "payment_date": "2024-02-01T10:00:00Z",
+    "payment_method": "card",
+    "reference": "TXN-2024-001567",
+    "notes": "Payment received via credit card",
+    "created_at": "2024-02-01T10:00:00Z"
+  }
+]
