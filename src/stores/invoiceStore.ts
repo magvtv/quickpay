@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
-import type { Database } from '@/types/database';  
-import { is } from 'zod/locales';
+import type { Database } from '@/types/database';
 
 // Types
 type Invoice = Database['public']['Tables']['invoices']['Row'];
@@ -26,24 +25,28 @@ interface InvoiceStore {
     error: string | null;
     isDrawerOpen: boolean;
     isModalOpen: boolean;
-   
+    filterStatus: 'all' | 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+    searchQuery: string;
 
     fetchInvoices: () => Promise<void>;
     fetchInvoiceById: (id: string) => Promise<void>;
     createInvoice: (data: InvoiceInsert) => Promise<void>;
-    updateInvoice: (id: string, data: InvoiceUpdate) => Promise<void>;
+    updateInvoice: (id: string, data: Omit<InvoiceUpdate, 'id'>) => Promise<void>;
     deleteInvoice: (id: string) => Promise<void>;
 
-    selectInvoice: (invice: Invoice | null) => void;
+    selectInvoice: (invoice: Invoice | null) => void;
     openDrawer: () => void;
     closeDrawer: () => void;
     openModal: (invoice: Invoice) => void;
     closeModal: () => void;
+    setFilterStatus: (status: 'all' | 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled') => void;
+    setSearchQuery: (query: string) => void;
 }
 
 // Zustand Store
 export const useInvoiceStore = create<InvoiceStore>()(
-  devtools((set, get) => ({
+  devtools(
+    (set, get) => ({
         // Initial State
         invoices: [],
         selectedInvoice: null,
@@ -51,6 +54,8 @@ export const useInvoiceStore = create<InvoiceStore>()(
         error: null,
         isDrawerOpen: false,
         isModalOpen: false,
+        filterStatus: 'all',
+        searchQuery: '',
         
         // Fetch all invoices
         fetchInvoices: async () => {
@@ -65,11 +70,13 @@ export const useInvoiceStore = create<InvoiceStore>()(
             set({ 
                 invoices: data || [], isLoading: false 
             });
-          } catch (error: any) {
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch invoices';
             set({
-                error: error.message, isLoading: false
-            })
-          };
+              error: errorMessage, 
+              isLoading: false
+            });
+          }
         },
 
         // Fetch single invoice by ID
@@ -86,9 +93,10 @@ export const useInvoiceStore = create<InvoiceStore>()(
             set({ 
                 selectedInvoice: data, isLoading: false 
             });
-          } catch (error: any) {
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch invoice';
             set({ 
-              error: error.message, 
+              error: errorMessage, 
               isLoading: false 
             });
             return null;
@@ -99,29 +107,31 @@ export const useInvoiceStore = create<InvoiceStore>()(
         createInvoice: async (invoiceData: InvoiceInsert) => {
           set({ isLoading: true, error: null });
           try {
-            const { error } = await supabase
-            .from('invoices')
-            .insert([invoiceData]);
+            const { error } = await (supabase
+              .from('invoices') as any)
+              .insert([invoiceData]);
             
             if (error) throw error;
             await get().fetchInvoices();
             set({ isLoading: false });
-          } catch (error: any) {
-                set({ 
-                    error: error.message, 
-                    isLoading: false 
-                });
-            };
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to create invoice';
+            set({ 
+              error: errorMessage, 
+              isLoading: false 
+            });
+          }
         },
 
         // Update Invoice
-        updateInvoice: async (id: string, updates: InvoiceUpdate) => {
+        updateInvoice: async (id: string, updates: Omit<InvoiceUpdate, 'id'>) => {
           set({ isLoading: true, error: null });
           try {
-            // Update invoice
-            const { error } = await supabase
-              .from('invoices')
-              .update(updates)
+            // Update invoice - exclude id from updates
+            const updateData = updates as Partial<InvoiceUpdate>;
+            const { error } = await (supabase
+              .from('invoices') as any)
+              .update(updateData)
               .eq('id', id);
 
             if (error) throw error;
@@ -129,9 +139,10 @@ export const useInvoiceStore = create<InvoiceStore>()(
             // Refresh invoices
             await get().fetchInvoices();
             set({ isLoading: false });
-          } catch (error: any) {
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update invoice';
             set({ 
-              error: error.message, 
+              error: errorMessage, 
               isLoading: false 
             });
           }
@@ -152,9 +163,10 @@ export const useInvoiceStore = create<InvoiceStore>()(
               invoices: state.invoices.filter((inv) => inv.id !== id),
               isLoading: false,
             }));
-          } catch (error: any) {
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete invoice';
             set({ 
-              error: error.message, 
+              error: errorMessage, 
               isLoading: false 
             });
           }
@@ -165,9 +177,11 @@ export const useInvoiceStore = create<InvoiceStore>()(
         openDrawer: () => set({ isDrawerOpen: true }),
         closeDrawer: () => set({ isDrawerOpen: false }),
         openModal: (invoice) => set({ selectedInvoice: invoice, isModalOpen: true }),
-        closeModal: () => set({ isModalOpen: false })
+        closeModal: () => set({ isModalOpen: false }),
+        setFilterStatus: (status) => set({ filterStatus: status }),
+        setSearchQuery: (query) => set({ searchQuery: query }),
       }),
-    )
+    { name: 'invoice-store' }
   )
 );
 
@@ -187,8 +201,8 @@ export const useFilteredInvoices = () => {
       filtered = filtered.filter(
         (inv) =>
           inv.invoice_number.toLowerCase().includes(query) ||
-          inv.client?.name.toLowerCase().includes(query) ||
-          inv.client?.email.toLowerCase().includes(query)
+          inv.client_name?.toLowerCase().includes(query) ||
+          inv.client_email?.toLowerCase().includes(query)
       );
     }
 
