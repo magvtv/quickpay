@@ -172,16 +172,18 @@ export const useFilteredInvoices = () => {
 };
 
 export const useDashboardStats = () => {
-  return useInvoiceStore((state) => {
-    const totalReceived = state.invoices
+  const invoices = useInvoiceStore((state) => state.invoices);
+  
+  return useMemo(() => {
+    const totalReceived = invoices
       .filter((inv) => inv.status === 'paid')
       .reduce((sum, inv) => sum + inv.total, 0);
 
-    const pending = state.invoices
+    const pending = invoices
       .filter((inv) => inv.status === 'sent' || inv.status === 'overdue')
       .reduce((sum, inv) => sum + inv.total, 0);
 
-    const drafts = state.invoices
+    const drafts = invoices
       .filter((inv) => inv.status === 'draft')
       .reduce((sum, inv) => sum + inv.total, 0);
 
@@ -189,7 +191,7 @@ export const useDashboardStats = () => {
       totalReceived,
       pending,
       drafts,
-      totalInvoices: state.invoices.length,
+      totalInvoices: invoices.length,
     };
-  });
+  }, [invoices]);
 };
