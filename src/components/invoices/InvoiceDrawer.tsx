@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, PlusIcon, EllipsisVerticalIcon, Square2StackIcon } from '@heroicons/react/24/outline';
 import { useInvoiceStore } from '@/stores/invoiceStore';
@@ -9,13 +9,20 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { invoiceFormSchema, calculateInvoiceTotals, generateInvoiceNumber } from '@/lib/validations/invoiceSchema';
+import { supabase } from '@/lib/supabase';
+import { mockClients } from '@/lib/mockData';
+import type { Database } from '@/types/database';
 import InvoicePreviewModal from './InvoicePreviewModal';
+
+type Client = Database['public']['Tables']['clients']['Row'];
 
 export default function InvoiceDrawer() {
   const { isDrawerOpen, closeDrawer, createInvoice } = useInvoiceStore();
   const { user } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoadingClients, setIsLoadingClients] = useState(false);
 
   const {
     register,
@@ -34,6 +41,8 @@ export default function InvoiceDrawer() {
       items: [{ description: '', quantity: 1, unit_price: 0, amount: 0 }],
       tax_rate: 0,
       is_recurring: false,
+      description: '',
+      notes: '',
     },
   });
 
@@ -42,9 +51,62 @@ export default function InvoiceDrawer() {
     name: 'items',
   });
 
+  // Fetch clients on mount
+  useEffect(() => {
+    const fetchClients = async () => {
+      setIsLoadingClients(true);
+      try {
+        const { data, error } = await supabase
+          .from('clients')
+          .select('*')
+          .order('name', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          setClients(data);
+        } else {
+          // Fallback to mock data
+          setClients(mockClients);
+        }
+      } catch {
+        // Fallback to mock data on error
+        setClients(mockClients);
+      } finally {
+        setIsLoadingClients(false);
+      }
+    };
+
+    if (isDrawerOpen) {
+      fetchClients();
+    }
+  }, [isDrawerOpen]);
+
   // Watch items to calculate totals
   const items = watch('items');
   const taxRate = watch('tax_rate');
+  const selectedClientId = watch('client_id');
+  const issueDate = watch('issue_date') as Date | string | undefined;
+  const dueDate = watch('due_date') as Date | string | undefined;
+  
+  // Get selected client details
+  const selectedClient = clients.find((c) => c.id === selectedClientId);
+
+  // Helper to format Date for date input (YYYY-MM-DD)
+  const formatDateForInput = (date: Date | string | undefined): string => {
+    if (!date) return '';
+    const dateObj = date instanceof Date ? date : new Date(date);
+    if (isNaN(dateObj.getTime())) return '';
+    return dateObj.toISOString().split('T')[0];
+  };
+
+  // Helper to convert date input value to Date object
+  const parseDateInput = (value: string | Date | undefined): Date => {
+    if (value instanceof Date) return value;
+    if (typeof value === 'string') {
+      const parsed = new Date(value);
+      return isNaN(parsed.getTime()) ? new Date() : parsed;
+    }
+    return new Date();
+  };
 
   const { subtotal, tax_amount, total } = calculateInvoiceTotals(
     items.map((item) => ({
@@ -60,19 +122,38 @@ export default function InvoiceDrawer() {
       return;
     }
 
+    if (!selectedClient) {
+      console.error('Please select a client');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { items: _items, ...invoiceData } = data;
+      const { items: _items, description, notes, ...invoiceData } = data;
+      
+      // Combine description and notes for database storage
+      // Database only has 'notes' field, so we combine them
+      const combinedNotes = [
+        description?.trim(),
+        notes?.trim(),
+      ]
+        .filter(Boolean)
+        .join('\n\n') || null;
+
       await createInvoice({
         ...invoiceData,
         user_id: user.id,
+        client_id: selectedClient.id,
         invoice_number: invoiceData.invoice_number || generateInvoiceNumber(),
         subtotal,
         tax_amount,
         total,
         issue_date: invoiceData.issue_date.toISOString(),
         due_date: invoiceData.due_date.toISOString(),
+        notes: combinedNotes,
+        client_name: selectedClient.name,
+        client_email: selectedClient.email,
       });
       closeDrawer();
     } catch (error) {
@@ -157,11 +238,15 @@ export default function InvoiceDrawer() {
                           </label>
                           <select
                             {...register('client_id')}
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
+                             disabled={isLoadingClients}
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <option value="">Select a client</option>
-                            <option value="1">Alex Parkinson (alex@email.com)</option>
-                            <option value="2">Thomas Lee (thomas@email.com)</option>
+                            {clients.map((client) => (
+                              <option key={client.id} value={client.id}>
+                                {client.name} ({client.email})
+                              </option>
+                            ))}
                           </select>
                           {errors.client_id && (
                             <p className="mt-1 text-sm text-red-600">{errors.client_id.message}</p>
@@ -174,12 +259,12 @@ export default function InvoiceDrawer() {
                             Project / Description
                           </label>
                           <input
-                            {...register('notes')}
+                            {...register('description')}
                             placeholder="Legal Consulting"
                             className="w-full px-3 py-2.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
                           />
-                          {errors.notes && (
-                            <p className="mt-1 text-sm text-red-600">{errors.notes.message}</p>
+                          {errors.description && (
+                            <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
                           )}
                         </div>
 
@@ -191,7 +276,17 @@ export default function InvoiceDrawer() {
                             </label>
                             <input
                               type="date"
-                              {...register('issue_date')}
+                              {...register('issue_date', {
+                                valueAsDate: false,
+                                setValueAs: (value) => {
+                                  if (!value) return new Date();
+                                  return new Date(value);
+                                },
+                              })}
+                              value={formatDateForInput(issueDate)}
+                              onChange={(e) => {
+                                setValue('issue_date', new Date(e.target.value), { shouldValidate: true });
+                              }}
                               className="w-full px-3 py-2.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
                             />
                             {errors.issue_date && (
@@ -204,7 +299,17 @@ export default function InvoiceDrawer() {
                             </label>
                             <input
                               type="date"
-                              {...register('due_date')}
+                              {...register('due_date', {
+                                valueAsDate: false,
+                                setValueAs: (value) => {
+                                  if (!value) return new Date();
+                                  return new Date(value);
+                                },
+                              })}
+                              value={formatDateForInput(dueDate ?? undefined)}
+                              onChange={(e) => {
+                                setValue('due_date', new Date(e.target.value), { shouldValidate: true });
+                              }}
                               className="w-full px-3 py-2.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
                             />
                             {errors.due_date && (
@@ -389,16 +494,10 @@ export default function InvoiceDrawer() {
         onClose={() => setIsPreviewOpen(false)}
         previewData={{
           invoice_number: watch('invoice_number') || generateInvoiceNumber(),
-          client_name: 'Alex Parkinson', // TODO: Get from client selection
-          client_email: watch('client_id') ? 'alex@email.com' : undefined,
-          issue_date: (() => {
-            const date = watch('issue_date');
-            return date instanceof Date ? date : new Date();
-          })(),
-          due_date: (() => {
-            const date = watch('due_date');
-            return date instanceof Date ? date : new Date();
-          })(),
+          client_name: selectedClient?.name || '',
+          client_email: selectedClient?.email || undefined,
+          issue_date: parseDateInput(issueDate as Date | string | undefined),
+          due_date: parseDateInput(dueDate as Date | string | undefined),
           items: items.map((item) => ({
             description: item.description,
             quantity: item.quantity,
@@ -409,6 +508,7 @@ export default function InvoiceDrawer() {
           tax_rate: taxRate || 0,
           tax_amount,
           total,
+          description: watch('description'),
           notes: watch('notes'),
         }}
       />

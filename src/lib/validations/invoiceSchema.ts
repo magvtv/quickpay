@@ -89,6 +89,11 @@ export const invoiceFormSchema = z
     total: z.number().positive('Total must be positive'),
     
     // Optional Fields
+    description: z
+      .string()
+      .max(200, 'Description cannot exceed 200 characters')
+      .optional()
+      .or(z.literal('')),
     notes: z
       .string()
       .max(1000, 'Notes cannot exceed 1000 characters')
