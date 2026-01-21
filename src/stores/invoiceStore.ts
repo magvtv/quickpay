@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
@@ -212,17 +213,22 @@ export const useInvoiceStore = create<InvoiceStore>()(
 
 // Computed Selectors
 export const useFilteredInvoices = () => {
-  return useInvoiceStore((state) => {
-    let filtered = state.invoices;
+  const invoices = useInvoiceStore((state) => state.invoices);
+  const filterStatus = useInvoiceStore((state) => state.filterStatus);
+  const searchQuery = useInvoiceStore((state) => state.searchQuery);
+
+  // Memoize filtered invoices to prevent infinite loops
+  return useMemo(() => {
+    let filtered = invoices;
 
     // Filter by status
-    if (state.filterStatus !== 'all') {
-      filtered = filtered.filter((inv) => inv.status === state.filterStatus);
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter((inv) => inv.status === filterStatus);
     }
 
     // Filter by search query
-    if (state.searchQuery) {
-      const query = state.searchQuery.toLowerCase();
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (inv) =>
           inv.invoice_number.toLowerCase().includes(query) ||
@@ -232,7 +238,7 @@ export const useFilteredInvoices = () => {
     }
 
     return filtered;
-  });
+  }, [invoices, filterStatus, searchQuery]);
 };
 
 export const useDashboardStats = () => {
