@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { MagnifyingGlassIcon, ChevronDownIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useInvoiceStore } from '@/stores/invoiceStore';
 import InvoiceRow from './InvoiceRow';
-import Button from '@/components/ui/Button';
 
 export default function InvoiceTable() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,15 +27,13 @@ export default function InvoiceTable() {
           </p>
         </div>
         
-        <Button
-          variant="primary"
-          size="md"
+        <button
           onClick={openDrawer}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold uppercase tracking-wide text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
         >
           <PlusIcon className="w-5 h-5" />
           NEW INVOICE
-        </Button>
+        </button>
       </div>
 
       {/* Search and Filter Bar */}
@@ -61,10 +58,10 @@ export default function InvoiceTable() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto p-6">
         <table className="w-full">
-          <thead className="bg-gray-50/50 border-b border-gray-100">
-            <tr>
+          <thead>
+            <tr className="border-b border-gray-100">
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 No.
               </th>
@@ -82,7 +79,7 @@ export default function InvoiceTable() {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {filteredInvoices.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-16 text-center">
