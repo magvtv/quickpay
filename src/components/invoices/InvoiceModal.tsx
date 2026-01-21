@@ -5,7 +5,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { useInvoiceStore } from '@/stores/invoiceStore';
 import { formatDate, formatCurrency } from '@/lib/utils';
-import StatusBadge from './StatusBadge';
 
 export default function InvoiceModal() {
   const { selectedInvoice, isModalOpen, closeModal } = useInvoiceStore();
