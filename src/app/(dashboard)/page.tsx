@@ -1,36 +1,42 @@
+'use client';
+
+import { useEffect } from 'react';
 import QuickPayCard from '@/components/dashboard/QuickPayCard';
-import StatsCard from '@/components/dashboard/StatsCard';
+import TotalReceivedCard from '@/components/dashboard/TotalReceivedCard';
+import InvoiceTable from '@/components/invoices/InvoiceTable';
+import { useInvoiceStore, useDashboardStats } from '@/stores/invoiceStore';
 
 export default function DashboardPage() {
+  const fetchInvoices = useInvoiceStore((state) => state.fetchInvoices);
+  const isLoading = useInvoiceStore((state) => state.isLoading);
+  const stats = useDashboardStats();
+
+  // Fetch invoices on mount
+  useEffect(() => {
+    fetchInvoices();
+  }, [fetchInvoices]);
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h1>
-        
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <StatsCard
-            label="Total Revenue"
-            amount={125430}
-            change="+12.5% from last month"
-            status="paid"
+      {/* Top Row - Stats Card and QuickPay Card side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {isLoading ? (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-pulse">
+            <div className="h-32 bg-gray-200 rounded" />
+          </div>
+        ) : (
+          <TotalReceivedCard
+            totalReceived={stats.totalReceived}
+            changePercentage="+10% since last month"
+            pendingAmount={stats.pending}
+            draftsAmount={stats.drafts}
           />
-          <StatsCard
-            label="Pending Payments"
-            amount={3420}
-            change="+5.2% from last month"
-            status="pending"
-          />
-          <StatsCard
-            label="Draft Invoices"
-            amount={850}
-            status="draft"
-          />
-        </div>
-
-        {/* QuickPay Card */}
-        <QuickPayCard username="yourcompany" />
+        )}
+        <QuickPayCard username="publicnote" />
       </div>
+
+      {/* Invoice List */}
+      <InvoiceTable />
     </div>
   );
 }
