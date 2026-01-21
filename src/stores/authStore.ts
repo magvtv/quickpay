@@ -1,7 +1,15 @@
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { supabase } from '@/lib/supabase';
-import type { User, Session } from '@supabase/supabase-js';
+import { devtools } from 'zustand/middleware';
+
+// Mock types for demo
+type User = {
+  id: string;
+  email?: string;
+} | null;
+
+type Session = {
+  user: User;
+} | null;
 
 
 // Types
@@ -24,8 +32,7 @@ interface AuthState {
 // Zustand Store
 export const useAuthStore = create<AuthState>()(
   devtools(
-    persist(
-      (set) => ({
+    (set) => ({
         // Initial State
         user: null,
         session: null,
@@ -35,163 +42,74 @@ export const useAuthStore = create<AuthState>()(
         
         initializeAuth: async () => {
           set({ isLoading: true });
-          try {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            
-            if (error) throw error;
-
+          // Mock auth for demo - just set to not loading
+          setTimeout(() => {
             set({ 
-              session, 
-              user: session?.user || null,
+              session: null, 
+              user: null,
               isLoading: false 
             });
-
-            // Set up auth state listener
-            supabase.auth.onAuthStateChange((_event, session) => {
-              set({ 
-                session, 
-                user: session?.user || null 
-              });
-            });
-          } catch (error: any) {
-            set({ 
-              error: error.message, 
-              isLoading: false 
-            });
-          }
+          }, 100);
         },
 
-        // Sign in
+        // Sign in (mock for demo)
         signIn: async (email: string, password: string) => {
           set({ isLoading: true, error: null });
-          try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-              email,
-              password,
-            });
-
-            if (error) throw error;
-
+          setTimeout(() => {
             set({ 
-              user: data.user,
-              session: data.session,
+              user: { id: '1', email },
+              session: { user: { id: '1', email } },
               isLoading: false 
             });
-            
-            return true;
-          } catch (error: any) {
-            set({ 
-              error: error.message, 
-              isLoading: false 
-            });
-            return false;
-          }
+          }, 500);
+          return true;
         },
 
-        // Sign up
+        // Sign up (mock for demo)
         signUp: async (email: string, password: string, fullName: string) => {
           set({ isLoading: true, error: null });
-          try {
-            const { data, error } = await supabase.auth.signUp({
-              email,
-              password,
-              options: {
-                data: {
-                  full_name: fullName,
-                },
-              },
-            });
-
-            if (error) throw error;
-
+          setTimeout(() => {
             set({ 
-              user: data.user,
-              session: data.session,
+              user: { id: '1', email },
+              session: { user: { id: '1', email } },
               isLoading: false 
             });
-            
-            return true;
-          } catch (error: any) {
-            set({ 
-              error: error.message, 
-              isLoading: false 
-            });
-            return false;
-          }
+          }, 500);
+          return true;
         },
 
-        // Sign out
+        // Sign out (mock for demo)
         signOut: async () => {
           set({ isLoading: true });
-          try {
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-
+          setTimeout(() => {
             set({ 
               user: null,
               session: null,
               isLoading: false 
             });
-          } catch (error: any) {
-            set({ 
-              error: error.message, 
-              isLoading: false 
-            });
-          }
+          }, 300);
         },
 
-        // Reset password
+        // Reset password (mock for demo)
         resetPassword: async (email: string) => {
           set({ isLoading: true, error: null });
-          try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-              redirectTo: `${window.location.origin}/auth/reset-password`,
-            });
-
-            if (error) throw error;
-
+          setTimeout(() => {
             set({ isLoading: false });
-            return true;
-          } catch (error: any) {
-            set({ 
-              error: error.message, 
-              isLoading: false 
-            });
-            return false;
-          }
+          }, 500);
+          return true;
         },
 
-        // Update password
+        // Update password (mock for demo)
         updatePassword: async (newPassword: string) => {
           set({ isLoading: true, error: null });
-          try {
-            const { error } = await supabase.auth.updateUser({
-              password: newPassword,
-            });
-
-            if (error) throw error;
-
+          setTimeout(() => {
             set({ isLoading: false });
-            return true;
-          } catch (error: any) {
-            set({ 
-              error: error.message, 
-              isLoading: false 
-            });
-            return false;
-          }
+          }, 500);
+          return true;
         },
 
         clearError: () => set({ error: null }),
       }),
-      {
-        name: 'auth-store',
-        partialize: (state) => ({
-          // Don't persist sensitive data
-          user: null,
-          session: null,
-        }),
-      }
-    )
+    { name: 'auth-store' }
   )
 );

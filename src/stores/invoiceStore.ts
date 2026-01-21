@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { supabase } from '@/lib/supabase';
 import { mockInvoices, mockClients, mockPayments } from '@/lib/mockData';
 import type { Database } from '@/types/database';
 
@@ -62,140 +61,71 @@ export const useInvoiceStore = create<InvoiceStore>()(
         // Fetch all invoices
         fetchInvoices: async () => {
           set({ isLoading: true, error: null });
-          try {
-            const { data, error } = await supabase
-            .from('invoices')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-            // If Supabase returns data successfully, use it
-            if (!error && data && data.length > 0) {
-              set({ 
-                  invoices: data, isLoading: false 
-              });
-              return;
-            }
-
-            // Otherwise, fall back to mock data
-            console.log('Using mock data as fallback');
+          // Use mock data for demo
+          setTimeout(() => {
             set({ 
                 invoices: mockInvoices as Invoice[], 
                 isLoading: false 
             });
-          } catch (error: unknown) {
-            // If there's an error connecting to Supabase, use mock data
-            console.log('Error connecting to Supabase, using mock data:', error);
-            set({
-              invoices: mockInvoices as Invoice[], 
-              isLoading: false,
-              error: null // Clear error since we have fallback data
-            });
-          }
+          }, 100); // Simulate loading
         },
 
         // Fetch single invoice by ID
         fetchInvoiceById: async (id: string) => {
           set({ isLoading: true, error: null });
-          try {
-            const { data, error } = await supabase
-              .from('invoices')
-              .select('*')
-              .eq('id', id)
-              .single();
-
-            // If Supabase returns data successfully, use it
-            if (!error && data) {
-              set({ 
-                  selectedInvoice: data, isLoading: false 
-              });
-              return;
-            }
-
-            // Otherwise, fall back to mock data
+          // Use mock data for demo
+          setTimeout(() => {
             const mockInvoice = mockInvoices.find(inv => inv.id === id) as Invoice | undefined;
             set({ 
                 selectedInvoice: mockInvoice || null, 
                 isLoading: false 
             });
-          } catch (error: unknown) {
-            // If there's an error connecting to Supabase, use mock data
-            const mockInvoice = mockInvoices.find(inv => inv.id === id) as Invoice | undefined;
-            set({ 
-              selectedInvoice: mockInvoice || null, 
-              isLoading: false,
-              error: null // Clear error since we have fallback data
-            });
-            return null;
-          }
+          }, 100);
         },
 
         // Create Invoice
         createInvoice: async (invoiceData: InvoiceInsert) => {
           set({ isLoading: true, error: null });
-          try {
-            const { error } = await (supabase
-              .from('invoices') as any)
-              .insert([invoiceData]);
+          // Simulate API call with mock data
+          setTimeout(() => {
+            const newInvoice = {
+              ...invoiceData,
+              id: `inv-${Date.now()}`,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            } as Invoice;
             
-            if (error) throw error;
-            await get().fetchInvoices();
-            set({ isLoading: false });
-          } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Failed to create invoice';
-            set({ 
-              error: errorMessage, 
-              isLoading: false 
-            });
-          }
+            set((state) => ({
+              invoices: [newInvoice, ...state.invoices],
+              isLoading: false,
+            }));
+          }, 300);
         },
 
         // Update Invoice
         updateInvoice: async (id: string, updates: Omit<InvoiceUpdate, 'id'>) => {
           set({ isLoading: true, error: null });
-          try {
-            // Update invoice - exclude id from updates
-            const updateData = updates as Partial<InvoiceUpdate>;
-            const { error } = await (supabase
-              .from('invoices') as any)
-              .update(updateData)
-              .eq('id', id);
-
-            if (error) throw error;
-
-            // Refresh invoices
-            await get().fetchInvoices();
-            set({ isLoading: false });
-          } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Failed to update invoice';
-            set({ 
-              error: errorMessage, 
-              isLoading: false 
-            });
-          }
+          // Simulate API call with mock data
+          setTimeout(() => {
+            set((state) => ({
+              invoices: state.invoices.map((inv) =>
+                inv.id === id ? { ...inv, ...updates, updated_at: new Date().toISOString() } : inv
+              ),
+              isLoading: false,
+            }));
+          }, 300);
         },
 
         // Delete Invoice
         deleteInvoice: async (id: string) => {
           set({ isLoading: true, error: null });
-          try {
-            const { error } = await supabase
-              .from('invoices')
-              .delete()
-              .eq('id', id);
-
-            if (error) throw error;
-
+          // Simulate API call with mock data
+          setTimeout(() => {
             set((state) => ({
               invoices: state.invoices.filter((inv) => inv.id !== id),
               isLoading: false,
             }));
-          } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Failed to delete invoice';
-            set({ 
-              error: errorMessage, 
-              isLoading: false 
-            });
-          }
+          }, 300);
         },
 
         // UI Actions

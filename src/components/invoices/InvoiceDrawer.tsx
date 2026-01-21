@@ -9,7 +9,6 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { invoiceFormSchema, calculateInvoiceTotals, generateInvoiceNumber } from '@/lib/validations/invoiceSchema';
-import { supabase } from '@/lib/supabase';
 import { mockClients } from '@/lib/mockData';
 import type { Database } from '@/types/database';
 import InvoicePreviewModal from './InvoicePreviewModal';
@@ -51,32 +50,15 @@ export default function InvoiceDrawer() {
     name: 'items',
   });
 
-  // Fetch clients on mount
+  // Load clients on mount
   useEffect(() => {
-    const fetchClients = async () => {
-      setIsLoadingClients(true);
-      try {
-        const { data, error } = await supabase
-          .from('clients')
-          .select('*')
-          .order('name', { ascending: true });
-
-        if (!error && data && data.length > 0) {
-          setClients(data);
-        } else {
-          // Fallback to mock data
-          setClients(mockClients);
-        }
-      } catch {
-        // Fallback to mock data on error
-        setClients(mockClients);
-      } finally {
-        setIsLoadingClients(false);
-      }
-    };
-
     if (isDrawerOpen) {
-      fetchClients();
+      setIsLoadingClients(true);
+      // Use mock data for demo
+      setTimeout(() => {
+        setClients(mockClients);
+        setIsLoadingClients(false);
+      }, 100);
     }
   }, [isDrawerOpen]);
 

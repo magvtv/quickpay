@@ -1,54 +1,11 @@
 import { createClient } from "@supabase/supabase-js"; 
 import { Database } from "../types/database";
 
-// Environment variables for Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
-
-if (!supabaseUrl || !supabasePublishableKey) {
-  const missingVars = [];
-  if (!supabaseUrl) missingVars.push('NEXT_PUBLIC_SUPABASE_URL');
-  if (!supabasePublishableKey) missingVars.push('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY');
-  
-  throw new Error(
-    `Missing Supabase environment variables: ${missingVars.join(', ')}. ` +
-    `Please set these in your Netlify environment variables or .env.local file.`
-  );
-}
-
-// Supabase Client Browser
-export const supabase = createClient<Database>(supabaseUrl, supabasePublishableKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-  db: {
-    schema: 'public',
-  },
-  global: {
-    headers: {
-      'x-application-name': 'quickpay-dashboard',
-    },
-  },
-});
-
-// Supabase Client Server-Side
+// NOTE: Supabase is disabled for demo - using mock data instead
+// Dummy client to prevent import errors
+export const supabase = null as any;
 export function createServerSupabaseClient() {
-  return createClient<Database>(supabaseUrl, supabasePublishableKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-    db: {
-      schema: 'public',
-    },
-    global: {
-      headers: {
-        'x-application-name': 'quickpay-dashboard',
-      },
-    },
-  });
+  return null as any;
 }
 
 // Database Types

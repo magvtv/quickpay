@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
@@ -15,30 +15,25 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const { user, isLoading, initializeAuth } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
 
+  // Prevent hydration mismatch by only rendering after client-side mount
   useEffect(() => {
+    setMounted(true);
     initializeAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (mounted && !isLoading && !user) {
       // router.push('/login');
       // For now, allow access without auth for development
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, router, mounted]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
-
-  // Allow rendering even without user for development
-  // Remove this if you want to require authentication
-  if (!user) {
+  // Render consistent layout on server and initial client render
+  // This prevents hydration mismatch
+  if (!mounted) {
     return (
       <>
         <div className="flex min-h-screen bg-[var(--primary-blue)]">
@@ -60,6 +55,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     );
   }
 
+  // After mounting, can show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
+  // Main layout (works with or without user for development)
   return (
     <>
       <div className="flex min-h-screen bg-[var(--primary-blue)]">

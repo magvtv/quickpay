@@ -1,30 +1,25 @@
 import { notFound } from 'next/navigation';
-import { createServerSupabaseClient, Tables } from '@/lib/supabase';
+import { mockInvoices } from '@/lib/mockData';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import type { Database } from '@/types/database';
 
 interface InvoicePageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-type Invoice = Tables<'invoices'>;
+type Invoice = Database['public']['Tables']['invoices']['Row'];
 
 export default async function PublicInvoicePage({ params }: InvoicePageProps) {
-  const supabase = createServerSupabaseClient();
+  const { id } = await params;
 
-  const { data, error } = await supabase
-    .from('invoices')
-    .select('*')
-    .eq('id', params.id)
-    .single();
+  // Use mock data for demo
+  const invoice = mockInvoices.find(inv => inv.id === id);
 
-  if (error || !data) {
+  if (!invoice) {
     notFound();
   }
-
-  // Now data is properly typed as Invoice after the null check
-  const invoice: Invoice = data;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

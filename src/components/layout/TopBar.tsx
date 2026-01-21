@@ -6,8 +6,8 @@ import { useAuthStore } from '@/stores/authStore';
 export default function TopBar() {
   const user = useAuthStore((state) => state.user);
 
-  // Get display name
-  const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'PH Magutu';
+  // Get display name - simplified for demo
+  const displayName = user?.email?.split('@')[0] || 'PH Magutu';
 
   return (
     <header className="sticky top-0 z-30 bg-white rounded-tl-[2rem] px-8 py-5">
@@ -26,18 +26,9 @@ export default function TopBar() {
           <button className="flex items-center gap-2">
             {/* User Avatar */}
             <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center border border-gray-200">
-              {user?.user_metadata?.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img 
-                  src={user.user_metadata.avatar_url} 
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-blue-600 font-semibold text-xs">
-                  {displayName.charAt(0).toUpperCase()}
-                </span>
-              )}
+              <span className="text-blue-600 font-semibold text-xs">
+                {displayName.charAt(0).toUpperCase()}
+              </span>
             </div>
             
             {/* Name and Dropdown */}
