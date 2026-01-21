@@ -38,29 +38,33 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // Remove this if you want to require authentication
   if (!user) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-[var(--primary-blue)]">
         <Sidebar />
-        <div className="flex-1 ml-64">
-          <TopBar />
-          <main className="p-6">
-            {children}
-          </main>
+        <div className="flex-1 ml-64 my-0">
+          <div className="min-h-screen bg-white rounded-l-[2rem] shadow-xl">
+            <TopBar />
+            <main className="p-8">
+              {children}
+            </main>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-[var(--primary-blue)]">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 ml-64">
-        <TopBar />
-        <main className="p-6">
-          {children}
-        </main>
+      <div className="flex-1 ml-64 my-0">
+        <div className="min-h-screen bg-white rounded-l-[2rem] shadow-xl">
+          <TopBar />
+          <main className="p-8">
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   );
