@@ -2,21 +2,71 @@
   {
     "id": "950e8400-e29b-41d4-a716-446655440001",
     "invoice_id": "750e8400-e29b-41d4-a716-446655440001",
-    "amount": 5500.00,
-    "payment_date": "2024-01-20T10:00:00Z",
+    "amount": 27500.00,
+    "payment_date": "2026-01-20T10:00:00Z",
     "payment_method": "bank_transfer",
-    "reference": "TXN-2024-001234",
-    "notes": "Payment received via bank transfer",
-    "created_at": "2024-01-20T10:00:00Z"
+    "reference": "STARK-2026-001234",
+    "notes": "Payment received via Stark Industries bank transfer",
+    "created_at": "2026-01-20T10:00:00Z"
   },
   {
     "id": "950e8400-e29b-41d4-a716-446655440002",
-    "invoice_id": "750e8400-e29b-41d4-a716-446655440005",
-    "amount": 13200.00,
-    "payment_date": "2024-02-01T10:00:00Z",
-    "payment_method": "card",
-    "reference": "TXN-2024-001567",
-    "notes": "Payment received via credit card",
-    "created_at": "2024-02-01T10:00:00Z"
+    "invoice_id": "750e8400-e29b-41d4-a716-446655440002",
+    "amount": 9222.50,
+    "payment_date": "2026-01-22T10:00:00Z",
+    "payment_method": "bank_transfer",
+    "reference": "SHIELD-2026-001567",
+    "notes": "Payment received via S.H.I.E.L.D. secure transfer",
+    "created_at": "2026-01-22T10:00:00Z"
+  },
+  {
+    "id": "950e8400-e29b-41d4-a716-446655440003",
+    "invoice_id": "750e8400-e29b-41d4-a716-446655440004",
+    "amount": 16350.00,
+    "payment_date": "2026-01-25T10:00:00Z",
+    "payment_method": "wire",
+    "reference": "SHIELD-2026-002001",
+    "notes": "Secure wire transfer from S.H.I.E.L.D. operations",
+    "created_at": "2026-01-25T10:00:00Z"
+  },
+  {
+    "id": "950e8400-e29b-41d4-a716-446655440004",
+    "invoice_id": "750e8400-e29b-41d4-a716-446655440006",
+    "amount": 12960.00,
+    "payment_date": "2026-01-28T10:00:00Z",
+    "payment_method": "bank_transfer",
+    "reference": "CULVER-2026-003456",
+    "notes": "Payment from Culver University research fund",
+    "created_at": "2026-01-28T10:00:00Z"
+  },
+  {
+    "id": "950e8400-e29b-41d4-a716-446655440005",
+    "invoice_id": "750e8400-e29b-41d4-a716-446655440008",
+    "amount": 38500.00,
+    "payment_date": "2026-01-29T10:00:00Z",
+    "payment_method": "international_wire",
+    "reference": "WAKANDA-2026-007890",
+    "notes": "International wire transfer from Wakanda Design Group",
+    "created_at": "2026-01-29T10:00:00Z"
+  },
+  {
+    "id": "950e8400-e29b-41d4-a716-446655440006",
+    "invoice_id": "750e8400-e29b-41d4-a716-446655440011",
+    "amount": 27500.00,
+    "payment_date": "2026-02-18T10:00:00Z",
+    "payment_method": "bank_transfer",
+    "reference": "STARK-2026-002345",
+    "notes": "February payment received via Stark Industries",
+    "created_at": "2026-02-18T10:00:00Z"
+  },
+  {
+    "id": "950e8400-e29b-41d4-a716-446655440007",
+    "invoice_id": "750e8400-e29b-41d4-a716-446655440012",
+    "amount": 38500.00,
+    "payment_date": "2026-02-25T10:00:00Z",
+    "payment_method": "international_wire",
+    "reference": "WAKANDA-2026-008901",
+    "notes": "February payment from Wakanda Design Group",
+    "created_at": "2026-02-25T10:00:00Z"
   }
 ]
