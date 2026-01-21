@@ -21,6 +21,7 @@ interface InvoicePreviewData {
   tax_rate: number;
   tax_amount: number;
   total: number;
+  description?: string;
   notes?: string;
 }
 
@@ -86,7 +87,7 @@ export default function InvoicePreviewModal({
                         {previewData.invoice_number}
                       </h2>
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
-                        LEGAL CONSULTING
+                        {previewData.description || 'LEGAL CONSULTING'}
                       </p>
                     </div>
 
