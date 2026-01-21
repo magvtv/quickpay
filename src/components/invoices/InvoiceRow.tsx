@@ -46,7 +46,7 @@ export default function InvoiceRow({ invoice, onClick }: InvoiceRowProps) {
 
       {/* Amount */}
       <td className="px-6 py-5 whitespace-nowrap text-right">
-        <span className="text-sm font-semibold text-gray-900">
+        <span className="text-lg font-semibold text-gray-900">
           {(() => {
             const formatted = formatCurrency(invoice.total);
             const [dollars, cents] = formatted.split('.');
@@ -54,7 +54,7 @@ export default function InvoiceRow({ invoice, onClick }: InvoiceRowProps) {
               <>
                 {dollars}
                 {cents && (
-                  <span className="text-gray-400">.{cents}</span>
+                  <span className="text-gray-400 text-base">.{cents}</span>
                 )}
               </>
             );
