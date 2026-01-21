@@ -17,9 +17,8 @@ export default function PaymentsPage() {
   return (
     <>
       <div className="space-y-8">
-        {/* Dashboard Section */}
+        {/* Stats and QuickPay Section */}
         <section>
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h2>
           <DashboardStats />
         </section>
 
