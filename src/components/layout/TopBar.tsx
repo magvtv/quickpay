@@ -7,7 +7,7 @@ export default function TopBar() {
   const user = useAuthStore((state) => state.user);
 
   // Get display name
-  const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Jonnathan Doe';
+  const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'PH Magutu';
 
   return (
     <header className="sticky top-0 z-30 bg-white rounded-tl-[2rem] px-8 py-5">
