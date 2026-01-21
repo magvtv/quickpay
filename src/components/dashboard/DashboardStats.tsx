@@ -26,7 +26,7 @@ export default function DashboardStats() {
     .reduce((sum, inv) => sum + inv.total, 0);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-[48%_52%] gap-6">
       {/* Total Received Card with Pending & Drafts */}
       <TotalReceivedCard
         totalReceived={totalReceived}

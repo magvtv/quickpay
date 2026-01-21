@@ -17,18 +17,21 @@ export default function TotalReceivedCard({
   draftsAmount,
   currency = 'USD',
 }: TotalReceivedCardProps) {
+  const formattedTotal = formatCurrency(totalReceived, currency);
+  const [dollars, cents] = formattedTotal.replace('$', '').split('.');
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-6">
         {/* Left Side - Total Received */}
-        <div className="flex-1">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+        <div className="flex-shrink-0">
+          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-3">
             TOTAL RECEIVED
           </span>
-          <div className="text-4xl font-bold text-gray-900 mt-2 mb-1">
-            <span className="text-lg align-top">$</span>
-            {formatCurrency(totalReceived, currency).replace('$', '').split('.')[0]}
-            <span className="text-2xl text-gray-400">.{formatCurrency(totalReceived, currency).split('.')[1] || '00'}</span>
+          <div className="text-4xl font-bold text-gray-900 mb-2 leading-none">
+            <span className="text-xl">$</span>
+            {dollars}
+            <span className="text-2xl text-gray-400">.{cents || '00'}</span>
           </div>
           {changePercentage && (
             <p className="text-sm font-medium text-green-500">
@@ -38,25 +41,25 @@ export default function TotalReceivedCard({
         </div>
 
         {/* Right Side - Pending & Drafts */}
-        <div className="flex flex-col gap-3 pl-6 border-l border-gray-100">
+        <div className="flex flex-col gap-4 pl-6 border-l border-gray-200 flex-shrink-0">
           {/* Pending */}
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-xs font-medium text-gray-500">Pending</span>
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              <span className="text-xs font-medium text-gray-600">Pending</span>
             </div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-base font-semibold text-gray-900">
               ${formatCurrency(pendingAmount, currency).replace('$', '')}
             </div>
           </div>
 
           {/* In Drafts */}
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full bg-orange-400" />
-              <span className="text-xs font-medium text-gray-500">In drafts</span>
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+              <span className="text-xs font-medium text-gray-600">In drafts</span>
             </div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-base font-semibold text-gray-900">
               ${formatCurrency(draftsAmount, currency).replace('$', '')}
             </div>
           </div>
