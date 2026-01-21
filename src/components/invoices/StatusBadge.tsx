@@ -13,30 +13,35 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
       label: 'Draft',
       dotColor: 'bg-orange-500',
       textColor: 'text-orange-600',
+      bgColor: 'bg-orange-50/50',
       icon: null,
     },
     sent: {
       label: 'Pending',
       dotColor: 'bg-blue-500',
       textColor: 'text-blue-600',
+      bgColor: 'bg-blue-50/50',
       icon: null,
     },
     paid: {
       label: 'Paid',
       dotColor: 'bg-green-500',
       textColor: 'text-green-600',
+      bgColor: 'bg-green-50/50',
       icon: CheckIcon,
     },
     overdue: {
       label: 'Overdue',
       dotColor: 'bg-red-500',
       textColor: 'text-red-600',
+      bgColor: 'bg-red-50/50',
       icon: null,
     },
     cancelled: {
       label: 'Cancelled',
       dotColor: 'bg-gray-400',
       textColor: 'text-gray-500',
+      bgColor: 'bg-gray-50/50',
       icon: null,
     },
   };
@@ -45,7 +50,10 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
   const Icon = config.icon;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn(
+      'inline-flex items-center gap-2 px-3 py-1.5 rounded-md',
+      config.bgColor
+    )}>
       {Icon ? (
         <Icon className={cn('w-4 h-4', config.textColor)} />
       ) : (
