@@ -29,6 +29,22 @@ export const supabase = createClient<Database>(supabaseUrl, supabasePublishableK
 });
 
 // Supabase Client Server-Side
+export function createServerSupabaseClient() {
+  return createClient<Database>(supabaseUrl, supabasePublishableKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+    db: {
+      schema: 'public',
+    },
+    global: {
+      headers: {
+        'x-application-name': 'quickpay-dashboard',
+      },
+    },
+  });
+}
 
 // Database Types
 export type Tables<T extends keyof Database['public']['Tables']> =

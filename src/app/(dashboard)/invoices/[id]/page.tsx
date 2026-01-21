@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { createServerSupabaseClient } from '@/lib/supabase';
+import { createServerSupabaseClient, Tables } from '@/lib/supabase';
 import { formatDate, formatCurrency } from '@/lib/utils';
 
 interface InvoicePageProps {
@@ -8,18 +8,23 @@ interface InvoicePageProps {
   };
 }
 
+type Invoice = Tables<'invoices'>;
+
 export default async function PublicInvoicePage({ params }: InvoicePageProps) {
   const supabase = createServerSupabaseClient();
 
-  const { data: invoice, error } = await supabase
+  const { data, error } = await supabase
     .from('invoices')
     .select('*')
     .eq('id', params.id)
     .single();
 
-  if (error || !invoice) {
+  if (error || !data) {
     notFound();
   }
+
+  // Now data is properly typed as Invoice after the null check
+  const invoice: Invoice = data;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
