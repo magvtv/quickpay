@@ -2,12 +2,17 @@ import { createClient } from "@supabase/supabase-js";
 import { Database } from "../types/database";
 
 // Environment variables for Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
 
 if (!supabaseUrl || !supabasePublishableKey) {
+  const missingVars = [];
+  if (!supabaseUrl) missingVars.push('NEXT_PUBLIC_SUPABASE_URL');
+  if (!supabasePublishableKey) missingVars.push('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY');
+  
   throw new Error(
-    'Missing Supabase environment variables. Check your .env.local file.'
+    `Missing Supabase environment variables: ${missingVars.join(', ')}. ` +
+    `Please set these in your Netlify environment variables or .env.local file.`
   );
 }
 
