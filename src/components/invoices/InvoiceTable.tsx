@@ -1,20 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MagnifyingGlassIcon, ChevronDownIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { useInvoiceStore } from '@/stores/invoiceStore';
+import { useInvoiceStore, useFilteredInvoices } from '@/stores/invoiceStore';
 import InvoiceRow from './InvoiceRow';
 
 export default function InvoiceTable() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { invoices, openModal, openDrawer } = useInvoiceStore();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+  const { openModal, openDrawer, filterStatus, setFilterStatus, setSearchQuery: setStoreSearchQuery } = useInvoiceStore();
+  
+  // Update store search query when local search changes
+  useEffect(() => {
+    setStoreSearchQuery(searchQuery);
+  }, [searchQuery, setStoreSearchQuery]);
 
-  // Filter invoices
-  const filteredInvoices = invoices.filter((invoice) =>
-    invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    invoice.client_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    invoice.client_email?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get filtered invoices from store (handles both status and search filtering)
+  const filteredInvoices = useFilteredInvoices();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const statusOptions = [
+    { value: 'all', label: 'Show all', storeValue: 'all' },
+    { value: 'paid', label: 'Paid', storeValue: 'paid' },
+    { value: 'pending', label: 'Pending', storeValue: 'sent' },
+    { value: 'overdue', label: 'Overdue', storeValue: 'overdue' },
+    { value: 'draft', label: 'Draft', storeValue: 'draft' },
+  ];
+
+  const currentStatusLabel = statusOptions.find(opt => 
+    opt.storeValue === filterStatus
+  )?.label || 'Show all';
+
+  const handleStatusChange = (value: string) => {
+    const option = statusOptions.find(opt => opt.value === value);
+    if (option) {
+      setFilterStatus(option.storeValue as 'all' | 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled');
+    }
+    setIsFilterOpen(false);
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100">
@@ -50,11 +85,34 @@ export default function InvoiceTable() {
           />
         </div>
 
-        {/* Show All Dropdown */}
-        <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap">
-          Show all
-          <ChevronDownIcon className="w-4 h-4" />
-        </button>
+        {/* Status Filter Dropdown */}
+        <div className="relative" ref={filterRef}>
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
+          >
+            {currentStatusLabel}
+            <ChevronDownIcon className={`w-4 h-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {isFilterOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+              {statusOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => handleStatusChange(option.value)}
+                  className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                    filterStatus === option.storeValue
+                      ? 'bg-blue-50 text-blue-600 font-medium'
+                      : 'text-gray-700'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Table */}
